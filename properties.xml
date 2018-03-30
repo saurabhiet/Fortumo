@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+
+	<property environment="env"/>
+
+	<property name="tomcat.home" value=""/>
+	
+	<property name="webapp.name" value="api"/>
+	<property name="lib.dir" value="web/WEB-INF/lib"/>
+	
+	  <property name="target.dir" value="target"/>
+	  <property name="classes.dir" value="${target.dir}/classes"/>
+	  <property name="junit.out.dir.xml"  value="${target.dir}/report/junit/xml"/>
+	  <property name="junit.out.dir.html" value="${target.dir}/report/junit/html"/>
+	<property name="test.src.dir" value="src/fortumo/tests"/>
+	
+</project>

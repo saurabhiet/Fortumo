@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="basesample" basedir="." default="deploy">
+	<import file="properties.xml" />
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="web/WEB-INF/lib/ant/ant-contrib-0.6.jar" />
+		</classpath>
+	</taskdef>
+
+	<target name="deploy" depends="compile-classes,testsuite,clean-tomcat,copy-lib" description="Deploy the project in tomcat">
+		
+		
+		<copy todir="${tomcat.home}/webapps/${webapp.name}/" includeEmptyDirs="no">
+			<fileset dir="web">
+				<include name="**" />
+				<exclude name="*/lib/" />
+				<exclude name="**/tests/" />
+			</fileset>
+		</copy>
+		<echo message="Application Deployed Successfully" />
+	</target>
+
+	 <target name="compile-classes">
+	 	<echo message="Deleting classes" />
+	 	
+		<delete includeemptydirs="true">
+			<fileset dir="web/WEB-INF/">
+				<include name="classes/" />
+			</fileset>
+		</delete>
+	 	<mkdir dir="web/WEB-INF/classes"/>
+	    <javac srcdir="src" destdir="web/WEB-INF/classes" includes="**/*.java" >
+
+		    <classpath>
+		     <fileset dir="${lib.dir}" includes="**/*.jar"/>
+		    </classpath>
+	    </javac>
+
+
+	 	</target>
+	
+	<target name="clean-tomcat" description="Removes the project from tomcat.">
+		<delete includeemptydirs="true">
+			<fileset dir="${tomcat.home}/webapps/">
+				<include name="${webapp.name}/" />
+			</fileset>
+		</delete>
+		<delete>
+			<fileset dir="${tomcat.home}/webapps/">
+				<include name="${webapp.name}.war" />
+			</fileset>
+		</delete>
+		<echo message="Application Removed From Tomcat Successfully" />
+	</target>
+
+
+	<target name="copy-lib">
+		<copy todir="${tomcat.home}/webapps/${webapp.name}/WEB-INF/lib/" includeEmptyDirs="no">
+			<fileset dir="web/WEB-INF/lib/json/" includes="**">
+			</fileset>
+			<fileset dir="web/WEB-INF/lib/jstl/" includes="**">
+			</fileset>
+			<fileset dir="web/WEB-INF/lib/spring-3.1/" includes="**">
+			</fileset>
+			<fileset dir="web/WEB-INF/lib/xstream/" includes="**">
+			</fileset>
+			<fileset dir="web/WEB-INF/lib/hibernate/" includes="**">
+			</fileset>
+		</copy>
+		<copy todir="${tomcat.home}/webapps/${webapp.name}/WEB-INF/classes/" includeEmptyDirs="no">
+			<fileset file="web/WEB-INF/lib/log4j.properties">
+			</fileset>
+
+		</copy>		
+		<echo message="Lib Copyied Successfully" />
+	</target>
+
+
+	<target name="create-war" depends="">
+		<war destfile="./${webapp.name}.war" duplicate="preserve" webxml="./web/WEB-INF/web.xml" compress="true">
+			<fileset dir="./web/">
+				<exclude name="**/web.xml" />
+				<exclude name="*/lib/" />
+				<exclude name="*/styles/" />
+				<exclude name="*/scripts/" />
+			</fileset>
+			<classes dir="./web/WEB-INF/classes" />
+			<lib file="./web/WEB-INF/lib/json/*.jar" />
+			<lib file="./web/WEB-INF/lib/jstl/*.jar" />
+			<lib file="./web/WEB-INF/lib/spring-3.1/*.jar" />
+			<lib file="./web/WEB-INF/lib/xstream/*.jar" />
+		</war>
+		<echo message="War Created Successfully" />
+	</target>
+
+
+	<target name="deploy-war" depends="clean-tomcat,create-war">
+		<copy todir="${tomcat.home}/webapps/" includeEmptyDirs="no">
+			<fileset dir=".">
+				<include name="${webapp.name}.war" />
+			</fileset>
+		</copy>
+		<echo message="WAR Deployed Successfully" />
+	</target>
+
+
+	
+
+	  <echo>Cleaning classes dir...</echo>
+	  <target name="clean" description="Delete earlier classes">
+	     <delete dir="${target.dir}" quiet="yes"/>
+	  </target>
+	
+	
+	  <echo>Make required directories...</echo>
+	  <target name="makedir" depends="clean" description="Create required directories">
+	   <mkdir dir="${classes.dir}"/>
+	  </target>
+	  <echo>Compile</echo>
+	  <target name="compile" depends="makedir" description="Compile java code." >
+	   <javac debug="true" destdir="${classes.dir}" includeantruntime="false">
+	    <src path="${test.src.dir}"/>
+	    <classpath>
+	     <fileset dir="${lib.dir}" includes="**/*.jar"/>
+	    </classpath>
+	   </javac>
+
+	  </target>
+	    <path id="classpath.test">
+	      <path path="${java.class.path}"/>
+	      <pathelement location="${classes.dir}"/>
+				<fileset dir="${lib.dir}" includes="**/*.jar"/>
+	      <path location="${classes.dir}"/>
+	
+	    	
+	     </path>
+	
+	  <echo>Running junit test suite...</echo>
+	   <target name="testsuite" depends="compile" description="Running Test Suite">
+	     <delete dir="${junit.out.dir.xml}"/>
+	     <mkdir  dir="${junit.out.dir.xml}"/>
+	     <junit printsummary="yes" haltonfailure="no" fork="yes" maxmemory="512m">
+	       <classpath refid="classpath.test"/>
+	       <sysproperty key="ant.home" value="${ant.home}"/>
+	       <formatter type="xml"/>
+	       <batchtest fork="yes" todir="${junit.out.dir.xml}">
+	         <fileset dir="${classes.dir}" includes="**/AllTests.class"/>
+	       </batchtest>
+	    </junit>
+	  </target>
+
+              
+</project>
