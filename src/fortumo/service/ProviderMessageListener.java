@@ -21,7 +21,7 @@ public class ProviderMessageListener implements MessageListener{
 		JSONObject jsonObject = null;
 		try{  
 			msg = message.getText();
-			System.out.println("Provider " + msg); 
+		
 			jsonObject = Util.stringToJson(msg);
 			response =  Util.makeGetRequest(jsonObject);
 			res = response.getStatusCode().value();
