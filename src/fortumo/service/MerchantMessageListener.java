@@ -22,7 +22,7 @@ public class MerchantMessageListener implements MessageListener{
 		try{  
 			msg = message.getText();
 			jsonObject = Util.stringToJson(msg);
-			System.out.println("merchant "+ msg);  
+	
 			JSONObject o = (JSONObject)jsonObject.get("payload");
 			String str = o.toString();
 			String keyword = o.getString("keyword");
